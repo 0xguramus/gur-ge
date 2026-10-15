@@ -5,10 +5,11 @@ import { getPosts, CATEGORIES, fmt } from '../../lib/site';
 export async function getStaticPaths() { return (await getPosts()).map(post => ({ params: { id: post.id }, props: { post } })); }
 const { post } = Astro.props; const { Content } = await render(post); const d = post.data;
 ---
-<Base title={d.title} description={d.description}>
+<Base title={d.title} description={d.description} image={d.image}>
   <article>
     <div class="meta"><a href={`/category/${d.category}/`}><b>{CATEGORIES[d.category]}</b></a> · {fmt(d.date)}</div>
     <h1 style="margin-top:8px">{d.title}</h1>
+    {d.image && <figure class="hero"><img src={d.image} alt={d.imageAlt || d.title} width="1200" height="630" loading="eager" fetchpriority="high" decoding="async" />{d.imageAlt && <figcaption>{d.imageAlt}</figcaption>}</figure>}
     <div class="prose"><Content /></div>
   </article>
   <p style="margin-top:40px"><a href="/">← ყველა ჩანაწერი</a></p>

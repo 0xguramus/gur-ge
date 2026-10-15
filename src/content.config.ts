@@ -8,6 +8,8 @@ const posts = defineCollection({
     date: z.coerce.date(),
     category: z.enum(['psychology', 'health', 'business', 'notes']),
     draft: z.boolean().default(false),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
   }),
 });
 export const collections = { posts };

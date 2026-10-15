@@ -41,6 +41,16 @@ content:
               label: ბიზნესი და მარკეტინგი
             - value: notes
               label: ზოგადი ჩანაწერები
+      - name: image
+        label: მთავარი სურათი
+        type: image
+        required: false
+        options:
+          multiple: false
+      - name: imageAlt
+        label: სურათის აღწერა
+        type: string
+        required: false
       - name: draft
         label: მონახაზი (არ გამოქვეყნდეს)
         type: boolean

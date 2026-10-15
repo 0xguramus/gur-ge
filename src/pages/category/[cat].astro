@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro'; import PostCard from '../../layouts/PostCard.astro';
+import { getPosts, CATEGORIES } from '../../lib/site';
+export function getStaticPaths() { return Object.keys(CATEGORIES).map(cat => ({ params: { cat } })); }
+const { cat } = Astro.params; const name = CATEGORIES[cat as keyof typeof CATEGORIES];
+const posts = (await getPosts()).filter(p => p.data.category === cat);
+---
+<Base title={name}>
+  <div class="chips"><a class="chip" href="/">ყველა</a>{Object.entries(CATEGORIES).map(([k, v]) => <a class={`chip ${k === cat ? 'active' : ''}`} href={`/category/${k}/`}>{v}</a>)}</div>
+  <h1>{name}</h1>
+  {posts.length ? posts.map(p => <PostCard post={p} />) : <p class="meta">ამ კატეგორიაში ჯერ ჩანაწერი არ არის.</p>}
+</Base>

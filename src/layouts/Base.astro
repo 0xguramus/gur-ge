@@ -1,0 +1,60 @@
+---
+import { SITE, CATEGORIES } from '../lib/site';
+const { title, description = SITE.description } = Astro.props;
+const full = title ? `${title} — ${SITE.title}` : SITE.title;
+---
+<!doctype html>
+<html lang="ka">
+<head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{full}</title><meta name="description" content={description} />
+<link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet" />
+<script is:inline>
+  const t = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.dataset.theme = t;
+</script>
+<style is:global>
+:root{--bg:#fbfaf7;--fg:#1d1d1f;--muted:#6b6b70;--card:#fff;--line:#e7e4dd;--accent:#b4475b;--chip:#f3eee6}
+[data-theme=dark]{--bg:#141416;--fg:#ececee;--muted:#a0a0a8;--card:#1d1d21;--line:#2c2c32;--accent:#e98399;--chip:#26262b}
+*{box-sizing:border-box}
+html{background:var(--bg);color:var(--fg)}
+body{margin:0;font-family:'Noto Sans Georgian',system-ui,sans-serif;line-height:1.75;font-size:17px}
+a{color:var(--accent)}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:18px;padding-bottom:18px;flex-wrap:wrap}
+.logo{font-family:'Noto Serif Georgian',serif;font-weight:700;font-size:1.5rem;color:var(--fg);text-decoration:none}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:16px;align-items:center;font-size:.95rem}
+nav a{color:var(--muted);text-decoration:none}nav a:hover{color:var(--fg)}
+#theme{background:var(--chip);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:4px 10px;cursor:pointer;font:inherit}
+main{padding:36px 0 60px}
+h1,h2,h3{font-family:'Noto Serif Georgian',serif;line-height:1.35}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.chip{background:var(--chip);border:1px solid var(--line);color:var(--fg);border-radius:999px;padding:5px 14px;font-size:.88rem;text-decoration:none;cursor:pointer;font-family:inherit}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:16px;text-decoration:none;color:var(--fg);transition:transform .15s}
+.card:hover{transform:translateY(-2px)}
+.card h2{margin:6px 0 6px;font-size:1.3rem}.card p{margin:0;color:var(--muted)}
+.meta{font-size:.85rem;color:var(--muted)}.meta b{color:var(--accent);font-weight:500}
+.example{display:inline-block;font-size:.75rem;background:#f5d9a8;color:#5a3d00;border-radius:6px;padding:1px 8px;margin-left:6px}
+.prose img{max-width:100%}.prose blockquote{border-left:3px solid var(--accent);margin:0;padding-left:16px;color:var(--muted)}
+.note{background:var(--chip);border:1px dashed var(--accent);border-radius:12px;padding:12px 16px}
+footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem}
+@media (max-width:560px){body{font-size:16px}nav{gap:12px;font-size:.88rem}header .wrap{padding-top:14px;padding-bottom:14px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <a class="logo" href="/">gur<span>.</span>ge</a>
+  <nav><a href="/">მთავარი</a><a href="/about/">ჩემ შესახებ</a><a href="/rss.xml">RSS</a>
+  <button id="theme" aria-label="თემის შეცვლა">◐</button></nav>
+</div></header>
+<main><div class="wrap"><slot /></div></main>
+<footer><div class="wrap">© {new Date().getFullYear()} gur.ge · {Object.values(CATEGORIES).join(' · ')}</div></footer>
+<script is:inline>
+document.getElementById('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('theme',r.dataset.theme)};
+</script>
+</body></html>

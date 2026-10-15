@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro'; import PostCard from '../layouts/PostCard.astro';
+import { getPosts, CATEGORIES, SITE } from '../lib/site';
+const posts = await getPosts();
+---
+<Base>
+  <h1 style="margin-top:0">ბოლო ჩანაწერები</h1>
+  <p class="meta" style="font-size:1rem;margin-top:-8px">{SITE.description}</p>
+  <div class="chips" id="filter">
+    <button class="chip active" data-f="all">ყველა</button>
+    {Object.entries(CATEGORIES).map(([k, v]) => <button class="chip" data-f={k}>{v}</button>)}
+  </div>
+  <div id="list">{posts.map(p => <PostCard post={p} />)}</div>
+  <p id="empty" class="meta" hidden>ამ კატეგორიაში ჯერ ჩანაწერი არ არის.</p>
+  <script is:inline>
+    const btns=document.querySelectorAll('#filter .chip');
+    btns.forEach(b=>b.onclick=()=>{btns.forEach(x=>x.classList.toggle('active',x===b));let n=0;
+      document.querySelectorAll('#list .card').forEach(c=>{const s=b.dataset.f==='all'||c.dataset.cat===b.dataset.f;c.hidden=!s;n+=s});
+      document.getElementById('empty').hidden=n>0;});
+  </script>
+</Base>

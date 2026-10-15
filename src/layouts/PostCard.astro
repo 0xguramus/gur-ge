@@ -1,0 +1,8 @@
+---
+import { CATEGORIES, fmt } from '../lib/site';
+const { post } = Astro.props; const d = post.data;
+---
+<a class="card" href={`/posts/${post.id}/`} data-cat={d.category}>
+  <div class="meta"><b>{CATEGORIES[d.category]}</b> · {fmt(d.date)}{post.id.startsWith('example') && <span class="example">ნიმუში</span>}</div>
+  <h2>{d.title}</h2><p>{d.description}</p>
+</a>

@@ -1,0 +1,15 @@
+---
+import Base from '../../layouts/Base.astro';
+import { render } from 'astro:content';
+import { getPosts, CATEGORIES, fmt } from '../../lib/site';
+export async function getStaticPaths() { return (await getPosts()).map(post => ({ params: { id: post.id }, props: { post } })); }
+const { post } = Astro.props; const { Content } = await render(post); const d = post.data;
+---
+<Base title={d.title} description={d.description}>
+  <article>
+    <div class="meta"><a href={`/category/${d.category}/`}><b>{CATEGORIES[d.category]}</b></a> · {fmt(d.date)}</div>
+    <h1 style="margin-top:8px">{d.title}</h1>
+    <div class="prose"><Content /></div>
+  </article>
+  <p style="margin-top:40px"><a href="/">← ყველა ჩანაწერი</a></p>
+</Base>

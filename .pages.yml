@@ -1,0 +1,50 @@
+media:
+  input: public/images
+  output: /images
+content:
+  - name: posts
+    label: ჩანაწერები
+    type: collection
+    path: src/content/posts
+    filename: "{year}-{month}-{day}-{primary}.md"
+    view:
+      fields: [title, category, date, draft]
+      primary: title
+      sort: [date, title]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: სათაური
+        type: string
+        required: true
+      - name: description
+        label: მოკლე აღწერა
+        type: text
+        required: true
+      - name: date
+        label: თარიღი
+        type: date
+        required: true
+      - name: category
+        label: კატეგორია
+        type: select
+        required: true
+        options:
+          values:
+            - value: psychology
+              label: ფსიქოლოგია
+            - value: health
+              label: ჯანმრთელობა
+            - value: business
+              label: ბიზნესი და მარკეტინგი
+            - value: notes
+              label: ზოგადი ჩანაწერები
+      - name: draft
+        label: მონახაზი (არ გამოქვეყნდეს)
+        type: boolean
+        default: false
+      - name: body
+        label: ტექსტი
+        type: rich-text

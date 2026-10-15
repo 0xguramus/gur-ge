@@ -1,0 +1,1 @@
+{"name":"gur-ge","type":"module","version":"1.0.0","scripts":{"dev":"astro dev","build":"astro build","preview":"astro preview"},"dependencies":{"@astrojs/rss":"^4.0.19","astro":"^5.18.2"}}

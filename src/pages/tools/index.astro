@@ -1,0 +1,16 @@
+---
+import Base from '../../layouts/Base.astro';
+const tools = [
+  { href: '/tools/compound-interest/', title: 'რთული პროცენტის კალკულატორი', desc: 'გამოთვალე დანაზოგის ზრდა რთული პროცენტით, ინფლაციის გათვალისწინებით, ან რამდენი უნდა გადადო თვეში მიზნის მისაღწევად.', image: '/images/og-compound-interest.png' },
+];
+---
+<Base title="ხელსაწყოები" description="უფასო ონლაინ ხელსაწყოები და კალკულატორები ქართულად.">
+  <h1 style="margin-top:0">ხელსაწყოები</h1>
+  <p class="meta" style="margin-top:-8px">მცირე, სასარგებლო კალკულატორები და ხელსაწყოები.</p>
+  {tools.map(t => (
+    <a class="card" href={t.href}>
+      <img class="thumb" src={t.image} alt="" loading="lazy" decoding="async" width="1200" height="630" />
+      <h2>{t.title}</h2><p>{t.desc}</p>
+    </a>
+  ))}
+</Base>

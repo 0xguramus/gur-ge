@@ -9,8 +9,10 @@ const full = title ? `${title} — ${SITE.title}` : SITE.title;
 <head>
 <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>{full}</title><meta name="description" content={description} />
+<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href} />
+<meta property="og:type" content="website" /><meta property="og:site_name" content={SITE.title} /><meta property="og:locale" content="ka_GE" /><meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href} />
 <meta property="og:title" content={full} /><meta property="og:description" content={description} />
-{ogImage && <meta property="og:image" content={ogImage} />}{ogImage && <meta name="twitter:card" content="summary_large_image" />}
+{ogImage && <meta property="og:image" content={ogImage} />}{ogImage && <meta property="og:image:width" content="1200" />}{ogImage && <meta property="og:image:height" content="630" />}{ogImage && <meta name="twitter:card" content="summary_large_image" />}<meta name="twitter:title" content={full} /><meta name="twitter:description" content={description} />
 <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet" />
@@ -54,7 +56,7 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 <body>
 <header><div class="wrap">
   <a class="logo" href="/">gur<span>.</span>ge</a>
-  <nav><a href="/">მთავარი</a><a href="/tools/compound-interest/">კალკულატორი</a><a href="/about/">ჩემ შესახებ</a><a href="/rss.xml">RSS</a>
+  <nav><a href="/">მთავარი</a><a href="/tools/">ხელსაწყოები</a><a href="/about/">ჩემ შესახებ</a><a href="/rss.xml">RSS</a>
   <button id="theme" aria-label="თემის შეცვლა">◐</button></nav>
 </div></header>
 <main><div class="wrap"><slot /></div></main>

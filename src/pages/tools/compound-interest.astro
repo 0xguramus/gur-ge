@@ -1,69 +1,128 @@
 ---
 import Base from '../../layouts/Base.astro';
 ---
-<Base title="რთული პროცენტის კალკულატორი" description="გამოთვალე, როგორ გაიზრდება შენი დანაზოგი რთული პროცენტით: საწყისი თანხა, ყოველთვიური შენატანი, საპროცენტო განაკვეთი და ვადა.">
-<h1 style="margin-top:0">რთული პროცენტის კალკულატორი</h1>
-<p class="meta" style="margin-top:-8px">შეიყვანე მონაცემები და შედეგი მყისიერად განახლდება.</p>
+<Base title="რთული პროცენტის კალკულატორი" description="გამოთვალე, როგორ გაიზრდება დანაზოგი რთული პროცენტით, ან რამდენი უნდა გადადო თვეში სასურველი თანხის დასაგროვებლად." image="/images/og-compound-interest.png">
+<p class="meta" style="margin:0"><a href="/tools/">← ხელსაწყოები</a></p>
+<h1 style="margin-top:4px">რთული პროცენტის კალკულატორი</h1>
+<div class="seg" role="tablist">
+  <button type="button" data-mode="grow" class="chip active">დაგროვება</button>
+  <button type="button" data-mode="goal" class="chip">მიზანი</button>
+</div>
+<p class="meta" id="modeHint" style="margin-top:-14px"></p>
 <form id="ci" class="ci-form" onsubmit="return false">
   <label>საწყისი თანხა<input id="p" type="number" inputmode="decimal" min="0" step="any" value="1000" /></label>
-  <label>ყოველთვიური შენატანი<input id="m" type="number" inputmode="decimal" min="0" step="any" value="100" /></label>
+  <label class="only-grow">ყოველთვიური შენატანი<input id="m" type="number" inputmode="decimal" min="0" step="any" value="100" /></label>
+  <label class="only-goal">მიზნობრივი თანხა<input id="goal" type="number" inputmode="decimal" min="0" step="any" value="50000" /></label>
   <label>წლიური საპროცენტო განაკვეთი (%)<input id="r" type="number" inputmode="decimal" min="0" step="any" value="10" /></label>
   <label>ვადა (წელი)<input id="y" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" /></label>
   <label>დარიცხვის სიხშირე<select id="n"><option value="1">წლიური</option><option value="4">კვარტალური</option><option value="12" selected>ყოველთვიური</option><option value="365">ყოველდღიური</option></select></label>
+  <label>შენატანის დრო<select id="due"><option value="0" selected>თვის ბოლოს</option><option value="1">თვის დასაწყისში</option></select></label>
+  <label>შენატანის წლიური ზრდა (%)<input id="g" type="number" inputmode="decimal" min="0" step="any" value="0" /></label>
+  <label>წლიური ინფლაცია (%)<input id="inf" type="number" inputmode="decimal" min="0" step="any" value="3" /></label>
   <label>ვალუტა<select id="c"><option value="₾" selected>₾ ლარი</option><option value="$">$ დოლარი</option><option value="€">€ ევრო</option></select></label>
 </form>
 <div class="ci-res">
-  <div><span>საბოლოო ბალანსი</span><b id="oF"></b></div>
+  <div class="only-goal hl"><span>საჭირო ყოველთვიური შენატანი</span><b id="oM"></b></div>
+  <div class="hl-grow"><span>საბოლოო ბალანსი</span><b id="oF"></b></div>
+  <div><span>რეალური ღირებულება (ინფლაციის გათვალისწინებით)</span><b id="oR"></b></div>
   <div><span>ჯამური შენატანი</span><b id="oC"></b></div>
   <div><span>დარიცხული პროცენტი</span><b id="oI"></b></div>
 </div>
+<p id="goalNote" class="note only-goal" hidden></p>
+<button type="button" id="copy" class="chip">🔗 ბმულის კოპირება</button> <span id="copied" class="meta" aria-live="polite"></span>
 <h2>ზრდის დინამიკა</h2>
-<div class="ci-legend"><i style="background:var(--muted)"></i>შენატანები <i style="background:var(--accent)"></i>პროცენტი</div>
-<svg id="chart" viewBox="0 0 600 260" role="img" aria-label="ბალანსის ზრდის დიაგრამა"></svg>
+<div class="ci-legend"><i style="background:var(--muted);opacity:.55"></i>შენატანები <i style="background:var(--accent)"></i>პროცენტი</div>
+<svg id="chart" viewBox="0 0 640 280" role="img" aria-label="ბალანსის ზრდის დიაგრამა"></svg>
+<p id="tip" class="meta tip">შეეხე სვეტს დეტალების სანახავად.</p>
 <h2>წლიური ჭრილი</h2>
-<div class="ci-table"><table><thead><tr><th>წელი</th><th>შენატანი</th><th>პროცენტი</th><th>ბალანსი</th></tr></thead><tbody id="tb"></tbody></table></div>
-<p class="meta">შენატანი ირიცხება ყოველი თვის ბოლოს. გამოთვლა საორიენტაციოა და არ წარმოადგენს ფინანსურ რჩევას.</p>
+<div class="ci-table"><table><thead><tr><th>წელი</th><th>შენატანი</th><th>პროცენტი</th><th>ბალანსი</th><th>რეალური</th></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="meta">გამოთვლა საორიენტაციოა და არ წარმოადგენს ფინანსურ რჩევას. შენატანის ზრდა ყოველი ახალი წლის დასაწყისიდან მოქმედებს.</p>
+<style is:global>
+.ci-res .hl b,body[data-mode=grow] .hl-grow b{color:var(--accent)}
+body[data-mode=grow] .only-goal,body[data-mode=goal] .only-grow{display:none!important}
+</style>
 <style>
+.seg{display:flex;gap:8px;margin:0 0 20px}
 .ci-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
 .ci-form label{display:flex;flex-direction:column;font-size:.88rem;color:var(--muted);gap:4px}
 .ci-form input,.ci-form select{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;-webkit-appearance:none;appearance:none}
 .ci-form input:focus,.ci-form select:focus{outline:2px solid var(--accent);border-color:transparent}
-.ci-res{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.ci-res{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:18px 0}
 .ci-res div{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.ci-res span{display:block;font-size:.8rem;color:var(--muted)}.ci-res b{font-size:1.15rem;word-break:break-word}
-.ci-res div:first-child b{color:var(--accent)}
+.ci-res span{display:block;font-size:.8rem;color:var(--muted);line-height:1.4}.ci-res b{font-size:1.15rem;word-break:break-word;font-variant-numeric:tabular-nums}
 .ci-legend{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px}.ci-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:8px}
-#chart{width:100%;height:auto;display:block;margin:8px 0}
+#chart{width:100%;height:auto;display:block;margin:8px 0;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#chart .hit{cursor:pointer}
+.tip{min-height:1.6em;background:var(--chip);border-radius:10px;padding:8px 12px}
 .ci-table{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
 .ci-table table{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
 .ci-table th,.ci-table td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-.ci-table th{background:var(--chip);font-weight:500;position:sticky;top:0}.ci-table th:first-child,.ci-table td:first-child{text-align:left}
+.ci-table th{background:var(--chip);font-weight:500}.ci-table th:first-child,.ci-table td:first-child{text-align:left}
+.ci-table tr.sel td{background:var(--chip)}
 @media (max-width:560px){.ci-form{grid-template-columns:1fr}.ci-res{grid-template-columns:1fr}}
 </style>
 <script is:inline>
 (function(){
 const $=id=>document.getElementById(id);
 const num=id=>{const v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0};
-function calc(P,M,rate,years,n){
-  // effective monthly rate for the chosen compounding frequency
-  const im=Math.pow(1+rate/100/n,n/12)-1;let bal=P,contrib=P;const rows=[];
-  for(let y=1;y<=years;y++){for(let k=0;k<12;k++){bal=bal*(1+im)+M;contrib+=M}rows.push({y,contrib,interest:bal-contrib,bal})}
+// fixed format: 16 387,93 ₾ (narrow no-break space as thousands separator, comma decimals)
+const fmtN=(v,d=2)=>{const neg=v<0;v=Math.abs(v);let [i,f]=v.toFixed(d).split('.');i=i.replace(/\B(?=(\d{3})+(?!\d))/g,'\u202F');return (neg?'−':'')+i+(f?','+f:'')};
+// core: month-by-month; rate converted to effective monthly for chosen compounding
+function calc(P,M,rate,years,n,due,g){
+  const im=Math.pow(1+rate/100/n,n/12)-1;let bal=P,contrib=P,m=M;const rows=[];
+  for(let y=1;y<=years;y++){if(y>1)m*=1+g/100;
+    for(let k=0;k<12;k++){if(due)bal+=m;bal*=1+im;if(!due)bal+=m;contrib+=m}
+    rows.push({y,contrib,interest:bal-contrib,bal})}
   return rows;
 }
-window.ciCalc=calc;
-function run(){
-  const cur=$('c').value,years=Math.min(100,Math.max(1,Math.round(num('y'))||1));
-  const f=v=>v.toLocaleString('ka-GE',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+cur;
-  const P=num('p'),rows=calc(P,num('m'),num('r'),years,+$('n').value),last=rows[rows.length-1];
-  $('oF').textContent=f(last.bal);$('oC').textContent=f(last.contrib);$('oI').textContent=f(last.interest);
-  $('tb').innerHTML=rows.map(r=>`<tr><td>${r.y}</td><td>${f(r.contrib)}</td><td>${f(r.interest)}</td><td><b>${f(r.bal)}</b></td></tr>`).join('');
-  const W=600,H=260,L=8,B=24,T=10,max=last.bal||1,bw=(W-L*2)/rows.length,g=Math.min(bw*.2,6);
-  let s='';rows.forEach((r,i)=>{const x=L+i*bw+g/2,w=bw-g,hc=(r.contrib/max)*(H-B-T),hi=(Math.max(r.interest,0)/max)*(H-B-T);
-    s+=`<rect x="${x}" y="${H-B-hc}" width="${w}" height="${hc}" fill="var(--muted)" opacity=".55" rx="2"><title>${r.y} წ.: ${f(r.bal)}</title></rect><rect x="${x}" y="${H-B-hc-hi}" width="${w}" height="${hi}" fill="var(--accent)" rx="2"><title>${r.y} წ.: ${f(r.bal)}</title></rect>`;
-    const step=Math.ceil(rows.length/10);if((i+1)%step===0||i===0)s+=`<text x="${x+w/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="var(--muted)">${r.y}</text>`;});
-  s+=`<line x1="${L}" x2="${W-L}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+// balance is linear in M, so required M = (goal - FV(M=0)) / FV(P=0,M=1)
+function needM(P,goal,rate,years,n,due,g){const a=calc(P,0,rate,years,n,due,g).at(-1).bal,b=calc(0,1,rate,years,n,due,g).at(-1).bal;return Math.max(0,(goal-a)/b)}
+window.ciCalc=calc;window.ciNeed=needM;window.ciFmt=fmtN;
+const ids=['p','m','goal','r','y','n','due','g','inf','c'];let mode='grow',rows=[],sel=null,cur='₾',inf=0;
+const q=new URLSearchParams(location.search);
+ids.forEach(k=>{if(q.has(k)){const el=$(k),v=q.get(k);if(el.tagName==='SELECT'?[...el.options].some(o=>o.value===v):isFinite(parseFloat(v)))el.value=v}});
+if(q.get('mode')==='goal')mode='goal';
+const f=v=>fmtN(v)+'\u00A0'+cur;
+const short=v=>v>=1e6?fmtN(v/1e6,v>=1e7?0:1)+' მლნ':v>=1e3?fmtN(v/1e3,v>=1e4?0:1)+' ათ.':fmtN(v,0);
+const real=(v,y)=>v/Math.pow(1+inf/100,y);
+function niceStep(max){const raw=max/4,p=Math.pow(10,Math.floor(Math.log10(raw||1))),s=raw/p;return (s<=1?1:s<=2?2:s<=2.5?2.5:s<=5?5:10)*p}
+function showTip(i){sel=i;const r=rows[i];if(!r)return;
+  $('tip').innerHTML=`<b>${r.y}-ე წელი:</b> ბალანსი ${f(r.bal)} · შენატანი ${f(r.contrib)} · პროცენტი ${f(r.interest)} · რეალური ${f(real(r.bal,r.y))}`;
+  document.querySelectorAll('#chart .bar').forEach((g,j)=>g.style.opacity=j===i?1:.45);
+  document.querySelectorAll('#tb tr').forEach((t,j)=>t.classList.toggle('sel',j===i));}
+function chart(){
+  const W=640,H=280,L=64,R=8,B=26,T=10,last=rows.at(-1),step=niceStep(last.bal||1),top=Math.ceil((last.bal||1)/step)*step,ph=H-B-T,bw=(W-L-R)/rows.length,gap=Math.min(bw*.2,6);
+  let s='';for(let v=0;v<=top+1e-9;v+=step){const y=H-B-v/top*ph;s+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)"/><text x="${L-6}" y="${y+4}" font-size="11" text-anchor="end" fill="var(--muted)">${short(v)}</text>`}
+  s+=`<text x="4" y="${T+2}" font-size="11" fill="var(--muted)">${cur}</text>`;
+  const ls=Math.ceil(rows.length/10);
+  rows.forEach((r,i)=>{const x=L+i*bw+gap/2,w=bw-gap,hc=r.contrib/top*ph,hi=Math.max(r.interest,0)/top*ph;
+    s+=`<g class="bar"><rect x="${x}" y="${H-B-hc}" width="${w}" height="${hc}" fill="var(--muted)" opacity=".55" rx="2"/><rect x="${x}" y="${H-B-hc-hi}" width="${w}" height="${hi}" fill="var(--accent)" rx="2"/></g>`;
+    if((i+1)%ls===0||i===0)s+=`<text x="${x+w/2}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--muted)">${r.y}</text>`;
+    s+=`<rect class="hit" data-i="${i}" x="${L+i*bw}" y="${T}" width="${bw}" height="${ph}" fill="transparent"/>`;});
   $('chart').innerHTML=s;
 }
+function run(){
+  document.body.dataset.mode=mode;
+  document.querySelectorAll('.seg button').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+  $('modeHint').textContent=mode==='goal'?'თვეში რამდენი უნდა გადავდო, რომ მივაღწიო სასურველ თანხას?':'რამდენი დაგროვდება ჩემი შენატანებით?';
+  cur=$('c').value;inf=num('inf');
+  const years=Math.min(100,Math.max(1,Math.round(num('y'))||1)),P=num('p'),r=num('r'),n=+$('n').value,due=$('due').value==='1',g=num('g');
+  let M=num('m');
+  if(mode==='goal'){const goal=num('goal');M=needM(P,goal,r,years,n,due,g);$('oM').textContent=f(M);
+    const gn=$('goalNote');gn.hidden=false;gn.textContent=M===0?'საწყისი თანხა პროცენტით თავისთავად მიაღწევს მიზანს — დამატებითი შენატანი საჭირო არ არის.':`${years} წელიწადში ${f(goal)}-ის დასაგროვებლად${g?` (შენატანის წლიური ${fmtN(g,g%1?1:0)}%-იანი ზრდით)`:''} პირველ წელს თვეში ${f(M)} უნდა გადადო.`;}
+  rows=calc(P,M,r,years,n,due,g);const last=rows.at(-1);
+  $('oF').textContent=f(last.bal);$('oC').textContent=f(last.contrib);$('oI').textContent=f(last.interest);$('oR').textContent=f(real(last.bal,years));
+  $('tb').innerHTML=rows.map(x=>`<tr><td>${x.y}</td><td>${f(x.contrib)}</td><td>${f(x.interest)}</td><td><b>${f(x.bal)}</b></td><td>${f(real(x.bal,x.y))}</td></tr>`).join('');
+  chart();if(sel!=null&&sel<rows.length)showTip(sel);else{sel=null;$('tip').textContent='შეეხე სვეტს დეტალების სანახავად.'}
+  const u=new URLSearchParams();u.set('mode',mode);ids.forEach(k=>{if(mode==='goal'&&k==='m'||mode==='grow'&&k==='goal')return;u.set(k,$(k).value)});
+  history.replaceState(null,'','?'+u.toString());
+}
+$('chart').addEventListener('click',e=>{const t=e.target.closest('.hit');if(t)showTip(+t.dataset.i)});
+$('chart').addEventListener('mousemove',e=>{const t=e.target.closest('.hit');if(t&&+t.dataset.i!==sel)showTip(+t.dataset.i)});
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;run()});
+$('copy').onclick=async()=>{const url=location.href;let ok=false;
+  try{await navigator.clipboard.writeText(url);ok=true}catch(e){const t=document.createElement('textarea');t.value=url;t.setAttribute('readonly','');t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();t.setSelectionRange(0,url.length);try{ok=document.execCommand('copy')}catch(_){}t.remove()}
+  $('copied').textContent=ok?'ბმული დაკოპირდა ✓':'კოპირება ვერ მოხერხდა — დააკოპირე მისამართის ზოლიდან.';setTimeout(()=>$('copied').textContent='',2500)};
 $('ci').addEventListener('input',run);$('ci').addEventListener('change',run);run();
 })();
 </script>

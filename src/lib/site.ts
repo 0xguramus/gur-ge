@@ -1,5 +1,5 @@
 import { getCollection } from 'astro:content';
-export const SITE = { title: 'gur.ge', description: 'პირადი ჩანაწერები ფსიქოლოგიაზე, ჯანსაღ ცხოვრებაზე, ბიზნესსა და მარკეტინგზე.' };
+export const SITE = { title: 'genius.ge', description: 'პირადი ჩანაწერები ფსიქოლოგიაზე, ჯანსაღ ცხოვრებაზე, ბიზნესსა და მარკეტინგზე.' };
 export const CATEGORIES = {
   psychology: 'ფსიქოლოგია',
   health: 'ჯანსაღი ცხოვრება',

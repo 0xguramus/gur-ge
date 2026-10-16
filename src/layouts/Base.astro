@@ -2,7 +2,7 @@
 import { SITE, CATEGORIES } from '../lib/site';
 import { CF_ANALYTICS_TOKEN } from '../lib/config';
 const { title, description = SITE.description, image } = Astro.props;
-const ogImage = image ? new URL(image, Astro.site ?? Astro.url).href : undefined;
+const ogImage = new URL(image || '/images/og-default.png', Astro.site ?? Astro.url).href;
 const full = title ? `${title} — ${SITE.title}` : SITE.title;
 ---
 <!doctype html>
@@ -14,6 +14,7 @@ const full = title ? `${title} — ${SITE.title}` : SITE.title;
 <meta property="og:type" content="website" /><meta property="og:site_name" content={SITE.title} /><meta property="og:locale" content="ka_GE" /><meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href} />
 <meta property="og:title" content={full} /><meta property="og:description" content={description} />
 {ogImage && <meta property="og:image" content={ogImage} />}{ogImage && <meta property="og:image:width" content="1200" />}{ogImage && <meta property="og:image:height" content="630" />}{ogImage && <meta name="twitter:card" content="summary_large_image" />}<meta name="twitter:title" content={full} /><meta name="twitter:description" content={description} />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" /><link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" /><link rel="apple-touch-icon" href="/apple-touch-icon.png" /><meta name="theme-color" content="#b4475b" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -32,7 +33,7 @@ a{color:var(--accent)}
 .wrap{max-width:760px;margin:0 auto;padding:0 20px}
 header{border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:18px;padding-bottom:18px;flex-wrap:wrap}
-.logo{font-family:'Noto Serif Georgian',serif;font-weight:700;font-size:1.5rem;color:var(--fg);text-decoration:none}
+.logo{font-family:Georgia,'Noto Serif Georgian',serif;font-weight:700;font-size:1.5rem;letter-spacing:-.01em;color:var(--fg);text-decoration:none}
 .logo span{color:var(--accent)}
 nav{display:flex;gap:16px;align-items:center;font-size:.95rem}
 nav a{color:var(--muted);text-decoration:none;white-space:nowrap}nav{flex-wrap:wrap;row-gap:6px}nav a:hover{color:var(--fg)}
@@ -61,12 +62,12 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 </head>
 <body>
 <header><div class="wrap">
-  <a class="logo" href="/">gur<span>.</span>ge</a>
+  <a class="logo" href="/" aria-label="genius.ge — მთავარი">genius<span>.</span>ge</a>
   <nav><a href="/">მთავარი</a><a href="/tools/">ხელსაწყოები</a><a href="/search/" aria-label="ძიება" title="ძიება">🔍</a><a href="/about/">ჩემ შესახებ</a><a href="/rss.xml">RSS</a>
   <button id="theme" aria-label="თემის შეცვლა">◐</button></nav>
 </div></header>
 <main><div class="wrap"><slot /></div></main>
-<footer><div class="wrap"><a href="/tags/" style="color:inherit">თეგები</a> · <a href="/search/" style="color:inherit">ძიება</a><br />© {new Date().getFullYear()} gur.ge · {Object.values(CATEGORIES).join(' · ')}</div></footer>
+<footer><div class="wrap"><a href="/tags/" style="color:inherit">თეგები</a> · <a href="/search/" style="color:inherit">ძიება</a><br />© {new Date().getFullYear()} {SITE.title} · {Object.values(CATEGORIES).join(' · ')}</div></footer>
 <script is:inline>
 document.getElementById('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('theme',r.dataset.theme)};
 </script>

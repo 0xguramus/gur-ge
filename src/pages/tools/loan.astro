@@ -1,0 +1,50 @@
+---
+import Base from '../../layouts/Base.astro'; import ToolKit from '../../components/ToolKit.astro';
+---
+<Base title="სესხისა და იპოთეკის კალკულატორი" description="გამოთვალე ყოველთვიური შენატანი, ჯამური პროცენტი და დაფარვის გრაფიკი — ანუიტეტური ან დიფერენცირებული სქემით." image="/images/og-loan.png">
+<ToolKit />
+<p class="meta" style="margin:0"><a href="/tools/">← ხელსაწყოები</a></p>
+<h1 style="margin-top:4px">სესხისა და იპოთეკის კალკულატორი</h1>
+<form class="tool-form" onsubmit="return false">
+  <label>ქონების ფასი<input id="price" type="number" inputmode="decimal" min="0" step="any" value="150000" /></label>
+  <label>თანამონაწილეობა (%)<input id="down" type="number" inputmode="decimal" min="0" max="100" step="any" value="20" /></label>
+  <label>წლიური საპროცენტო განაკვეთი (%)<input id="r" type="number" inputmode="decimal" min="0" step="any" value="12" /></label>
+  <label>ვადა (წელი)<input id="y" type="number" inputmode="decimal" min="0.5" max="50" step="any" value="20" /></label>
+  <label>დაფარვის სქემა<select id="t"><option value="a" selected>ანუიტეტური — თანაბარი</option><option value="d">დიფერენცირებული — კლებადი</option></select></label>
+  <label>ვალუტა<select id="c"><option value="₾" selected>₾ ლარი</option><option value="$">$ დოლარი</option><option value="€">€ ევრო</option></select></label>
+</form>
+<p class="meta">სამომხმარებლო სესხისთვის თანამონაწილეობა მიუთითე 0%, ხოლო ქონების ფასის ველში — სესხის თანხა.</p>
+<div class="tool-res">
+  <div class="hl"><span id="lP">ყოველთვიური შენატანი</span><b id="oP"></b></div>
+  <div><span>სესხის თანხა</span><b id="oL"></b></div>
+  <div><span>ჯამური პროცენტი</span><b id="oI"></b></div>
+  <div><span>ჯამში გადასახდელი</span><b id="oT"></b></div>
+</div>
+<div class="tool-bar" aria-hidden="true"><i id="bP" style="background:var(--muted);opacity:.55"></i><i id="bI" style="background:var(--accent)"></i></div>
+<p class="meta" id="split" style="margin-top:0"></p>
+<button type="button" id="copy" class="chip">🔗 ბმულის კოპირება</button> <span id="copied" class="meta" aria-live="polite"></span>
+<h2>დაფარვის გრაფიკი წლების მიხედვით</h2>
+<div class="tool-table"><table><thead><tr><th>წელი</th><th>ძირი</th><th>პროცენტი</th><th>ჯამი</th><th>ნაშთი</th></tr></thead><tbody id="ty"></tbody></table></div>
+<details class="more"><summary>ყოველთვიური გრაფიკი</summary>
+<div class="tool-table"><table><thead><tr><th>თვე</th><th>შენატანი</th><th>ძირი</th><th>პროცენტი</th><th>ნაშთი</th></tr></thead><tbody id="tm"></tbody></table></div></details>
+<p class="meta">გამოთვლა საორიენტაციოა: ბანკის საკომისიოები, დაზღვევა და ეფექტური საპროცენტო განაკვეთი შეიძლება განსხვავდებოდეს.</p>
+<script is:inline>
+(function(){const $=id=>document.getElementById(id),{fmtN,num}=GT;
+function schedule(L,rate,n,type){const i=rate/100/12,rows=[];let bal=L;
+  const A=i?L*i/(1-Math.pow(1+i,-n)):L/n,pr=L/n;
+  for(let k=1;k<=n;k++){const int=bal*i;let p=type==='a'?A-int:pr;if(k===n)p=bal;bal-=p;rows.push({k,pay:p+int,p,int,bal:Math.max(0,bal)})}
+  return rows}
+window.loanSchedule=schedule;
+GT.state(['price','down','r','y','t','c'],()=>{const cur=$('c').value,f=v=>fmtN(v)+'\u00A0'+cur;
+  const L=num('price')*(1-Math.min(100,num('down'))/100),n=Math.max(1,Math.round(num('y')*12)),type=$('t').value,rows=schedule(L,num('r'),n,type);
+  const tot=rows.reduce((s,r)=>s+r.pay,0),ti=tot-L;
+  $('lP').textContent=type==='a'?'ყოველთვიური შენატანი':'პირველი / ბოლო შენატანი';
+  $('oP').textContent=type==='a'?f(rows[0].pay):f(rows[0].pay)+' → '+f(rows.at(-1).pay);
+  $('oL').textContent=f(L);$('oI').textContent=f(ti);$('oT').textContent=f(tot);
+  const pp=tot?L/tot*100:100;$('bP').style.width=pp+'%';$('bI').style.width=(100-pp)+'%';
+  $('split').textContent=`ძირი ${fmtN(pp,1)}% · პროცენტი ${fmtN(100-pp,1)}%`;
+  let yr='';for(let y=0;y*12<n;y++){const s=rows.slice(y*12,y*12+12),P=s.reduce((a,r)=>a+r.p,0),I=s.reduce((a,r)=>a+r.int,0);yr+=`<tr><td>${y+1}</td><td>${f(P)}</td><td>${f(I)}</td><td>${f(P+I)}</td><td>${f(s.at(-1).bal)}</td></tr>`}
+  $('ty').innerHTML=yr;$('tm').innerHTML=rows.map(r=>`<tr><td>${r.k}</td><td>${f(r.pay)}</td><td>${f(r.p)}</td><td>${f(r.int)}</td><td>${f(r.bal)}</td></tr>`).join('');});
+GT.copy($('copy'),$('copied'));})();
+</script>
+</Base>

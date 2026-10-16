@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro'; import ToolKit from '../../components/ToolKit.astro';
+---
+<Base title="მარჟის, ნაცენისა და ფასის კალკულატორი" description="გამოთვალე მარჟა, ნაცენი და გასაყიდი ფასი დღგ-ის გათვალისწინებით." image="/images/og-margin.png">
+<ToolKit />
+<p class="meta" style="margin:0"><a href="/tools/">← ხელსაწყოები</a></p>
+<h1 style="margin-top:4px">მარჟის, ნაცენისა და ფასის კალკულატორი</h1>
+<form class="tool-form" onsubmit="return false">
+  <label>თვითღირებულება (ერთეულის)<input id="cost" type="number" inputmode="decimal" min="0" step="any" value="80" /></label>
+  <label>რას ვიცით?<select id="mode"><option value="price" selected>გასაყიდ ფასს (დღგ-ის გარეშე)</option><option value="margin">სასურველ მარჟას (%)</option><option value="markup">სასურველ ნაცენს (%)</option></select></label>
+  <label id="vLabel">მნიშვნელობა<input id="v" type="number" inputmode="decimal" min="0" step="any" value="100" /></label>
+  <label>რაოდენობა (ცალი)<input id="qty" type="number" inputmode="numeric" min="1" step="1" value="1" /></label>
+  <label>დღგ (%)<input id="vat" type="number" inputmode="decimal" min="0" step="any" value="18" /></label>
+  <label>ვალუტა<select id="c"><option value="₾" selected>₾ ლარი</option><option value="$">$ დოლარი</option><option value="€">€ ევრო</option></select></label>
+</form>
+<div class="tool-res">
+  <div class="hl"><span>გასაყიდი ფასი (დღგ-ის გარეშე)</span><b id="oP"></b></div>
+  <div class="hl"><span>ფასი დღგ-ის ჩათვლით</span><b id="oV"></b></div>
+  <div><span>მარჟა</span><b id="oM"></b></div>
+  <div><span>ნაცენი</span><b id="oU"></b></div>
+  <div><span>მოგება ერთეულზე</span><b id="oG"></b></div>
+  <div><span>ჯამური მოგება</span><b id="oQ"></b></div>
+</div>
+<p id="warn" class="note" hidden></p>
+<button type="button" id="copy" class="chip">🔗 ბმულის კოპირება</button> <span id="copied" class="meta" aria-live="polite"></span>
+<h2>რა განსხვავებაა მარჟასა და ნაცენს შორის?</h2>
+<p><b>მარჟა</b> არის მოგების წილი გასაყიდ ფასში: (ფასი − თვითღირებულება) ÷ ფასი. <b>ნაცენი</b> არის მოგების წილი თვითღირებულებაში: (ფასი − თვითღირებულება) ÷ თვითღირებულება. მაგალითად, 80 ₾-ად შეძენილი პროდუქტი 100 ₾-ად თუ იყიდება, მარჟა 20%-ია, ნაცენი კი — 25%.</p>
+<p class="meta">დღგ-ის ნაგულისხმევი განაკვეთი (18%) საქართველოს მოქმედ განაკვეთს შეესაბამება. თუ დღგ-ის გადამხდელი არ ხარ, მიუთითე 0.</p>
+<script is:inline>
+(function(){const $=id=>document.getElementById(id),{fmtN,num}=GT;
+function price(cost,mode,v){return mode==='price'?v:mode==='margin'?(v<100?cost/(1-v/100):NaN):cost*(1+v/100)}window.mPrice=price;
+const lbl={price:'გასაყიდი ფასი',margin:'მარჟა (%)',markup:'ნაცენი (%)'};let last=null;
+GT.state(['cost','mode','v','qty','vat','c'],()=>{const cur=$('c').value,f=v=>fmtN(v)+'\u00A0'+cur,mode=$('mode').value,cost=num('cost');
+  if(last!==null&&mode!==last){$('v').value=mode==='price'?100:mode==='margin'?20:25;last=mode}
+  last=mode;$('vLabel').firstChild.textContent=lbl[mode];
+  const P=price(cost,mode,num('v')),g=P-cost,q=Math.max(1,Math.round(num('qty')));
+  $('oP').textContent=f(P);$('oV').textContent=f(P*(1+num('vat')/100));
+  $('oM').textContent=P?fmtN(g/P*100,2)+'%':'—';$('oU').textContent=cost?fmtN(g/cost*100,2)+'%':'—';
+  $('oG').textContent=f(g);$('oQ').textContent=f(g*q);
+  const w=$('warn');w.hidden=!(mode==='margin'&&num('v')>=100)&&!(g<0);w.textContent=g<0?'ფასი თვითღირებულებაზე დაბალია — ერთეულზე ზარალი გაქვს.':'მარჟა 100%-ს ვერ მიაღწევს ან გადააჭარბებს — შეამცირე მნიშვნელობა.';});
+GT.copy($('copy'),$('copied'));})();
+</script>
+</Base>

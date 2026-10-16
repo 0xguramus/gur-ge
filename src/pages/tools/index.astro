@@ -1,15 +1,19 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Img from '../../components/Img.astro';
 const tools = [
   { href: '/tools/compound-interest/', title: 'რთული პროცენტის კალკულატორი', desc: 'გამოთვალე დანაზოგის ზრდა რთული პროცენტით, ინფლაციის გათვალისწინებით, ან რამდენი უნდა გადადო თვეში მიზნის მისაღწევად.', image: '/images/og-compound-interest.png' },
+  { href: '/tools/loan/', title: 'სესხისა და იპოთეკის კალკულატორი', desc: 'ყოველთვიური შენატანი, ჯამური პროცენტი და დაფარვის გრაფიკი — ანუიტეტური ან დიფერენცირებული სქემით.', image: '/images/og-loan.png' },
+  { href: '/tools/bmi-calories/', title: 'BMI და კალორიების კალკულატორი', desc: 'სხეულის მასის ინდექსი და დღიური კალორიების საჭიროება აქტივობისა და მიზნის მიხედვით.', image: '/images/og-bmi.png' },
+  { href: '/tools/margin/', title: 'მარჟის, ნაცენისა და ფასის კალკულატორი', desc: 'გამოთვალე მარჟა, ნაცენი, მოგება და გასაყიდი ფასი დღგ-ის ჩათვლით.', image: '/images/og-margin.png' },
 ];
 ---
-<Base title="ხელსაწყოები" description="უფასო ონლაინ ხელსაწყოები და კალკულატორები ქართულად.">
+<Base title="ხელსაწყოები" description="უფასო ონლაინ კალკულატორები ქართულად: რთული პროცენტი, სესხი და იპოთეკა, BMI და კალორიები, მარჟა და ფასი.">
   <h1 style="margin-top:0">ხელსაწყოები</h1>
-  <p class="meta" style="margin-top:-8px">მცირე, სასარგებლო კალკულატორები და ხელსაწყოები.</p>
+  <p class="meta" style="margin-top:-8px">მცირე, სასარგებლო კალკულატორები. ყველა გამოთვლა შენს მოწყობილობაზე სრულდება.</p>
   {tools.map(t => (
     <a class="card" href={t.href}>
-      <img class="thumb" src={t.image} alt="" loading="lazy" decoding="async" width="1200" height="630" />
+      <Img class="thumb" src={t.image} alt="" />
       <h2>{t.title}</h2><p>{t.desc}</p>
     </a>
   ))}

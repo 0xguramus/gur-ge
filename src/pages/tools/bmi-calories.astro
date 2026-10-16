@@ -1,0 +1,52 @@
+---
+import Base from '../../layouts/Base.astro'; import ToolKit from '../../components/ToolKit.astro';
+---
+<Base title="სხეულის მასის ინდექსი და კალორიების კალკულატორი" description="გამოთვალე სხეულის მასის ინდექსი (BMI) და დღიური კალორიების საჭიროება მიფლინ-სან ჟეორის ფორმულით." image="/images/og-bmi.png">
+<ToolKit />
+<p class="meta" style="margin:0"><a href="/tools/">← ხელსაწყოები</a></p>
+<h1 style="margin-top:4px">BMI და კალორიების კალკულატორი</h1>
+<form class="tool-form" onsubmit="return false">
+  <label>სქესი<select id="s"><option value="m" selected>მამრობითი</option><option value="f">მდედრობითი</option></select></label>
+  <label>ასაკი (წელი)<input id="a" type="number" inputmode="numeric" min="15" max="100" step="1" value="30" /></label>
+  <label>სიმაღლე (სმ)<input id="h" type="number" inputmode="decimal" min="100" max="250" step="any" value="175" /></label>
+  <label>წონა (კგ)<input id="w" type="number" inputmode="decimal" min="30" max="300" step="any" value="75" /></label>
+  <label>ფიზიკური აქტივობა<select id="act">
+    <option value="1.2">მინიმალური (უძრავი ცხოვრების წესი)</option>
+    <option value="1.375" selected>დაბალი (ვარჯიში კვირაში 1–3-ჯერ)</option>
+    <option value="1.55">საშუალო (ვარჯიში კვირაში 3–5-ჯერ)</option>
+    <option value="1.725">მაღალი (ვარჯიში კვირაში 6–7-ჯერ)</option>
+    <option value="1.9">ძალიან მაღალი (ფიზიკური შრომა, ორჯერადი ვარჯიში)</option></select></label>
+  <label>მიზანი<select id="g">
+    <option value="-500">წონის კლება (~0,5 კგ კვირაში)</option>
+    <option value="-250">ზომიერი კლება (~0,25 კგ კვირაში)</option>
+    <option value="0" selected>წონის შენარჩუნება</option>
+    <option value="250">ზომიერი მატება</option>
+    <option value="500">წონის მატება</option></select></label>
+</form>
+<div class="tool-res">
+  <div class="hl"><span>სხეულის მასის ინდექსი (BMI)</span><b id="oB"></b></div>
+  <div><span>კატეგორია</span><b id="oK"></b></div>
+  <div class="hl"><span>დღიური კალორიები მიზნისთვის</span><b id="oG"></b></div>
+  <div><span>შენარჩუნების კალორიები (TDEE)</span><b id="oT"></b></div>
+  <div><span>ბაზალური ცვლა (BMR)</span><b id="oR"></b></div>
+  <div><span>ჯანსაღი წონის დიაპაზონი შენი სიმაღლისთვის</span><b id="oW"></b></div>
+</div>
+<p id="warn" class="note" hidden></p>
+<button type="button" id="copy" class="chip">🔗 ბმულის კოპირება</button> <span id="copied" class="meta" aria-live="polite"></span>
+<h2>BMI-ის კატეგორიები (ჯანმო)</h2>
+<div class="tool-table"><table><thead><tr><th>BMI</th><th>კატეგორია</th></tr></thead><tbody>
+<tr><td>18,5-ზე ნაკლები</td><td>წონის დეფიციტი</td></tr><tr><td>18,5 – 24,9</td><td>ნორმალური წონა</td></tr>
+<tr><td>25 – 29,9</td><td>ჭარბი წონა</td></tr><tr><td>30 და მეტი</td><td>სიმსუქნე</td></tr></tbody></table></div>
+<p class="meta">BMI არ ითვალისწინებს კუნთოვან მასას, ამიტომ სპორტსმენებთან, ორსულებთან და ხანდაზმულებთან შეიძლება არაზუსტი იყოს. კალკულატორი საინფორმაციოა და არ ცვლის ექიმის ან დიეტოლოგის კონსულტაციას.</p>
+<script is:inline>
+(function(){const $=id=>document.getElementById(id),{fmtN,num}=GT;
+const bmr=(s,w,h,a)=>10*w+6.25*h-5*a+(s==='m'?5:-161);window.mifflin=bmr;
+const cat=b=>b<18.5?'წონის დეფიციტი':b<25?'ნორმალური წონა':b<30?'ჭარბი წონა':'სიმსუქნე';
+GT.state(['s','a','h','w','act','g'],()=>{const s=$('s').value,a=num('a'),h=num('h'),w=num('w'),m=h/100;
+  const B=m?w/(m*m):0,R=bmr(s,w,h,a),T=R*+$('act').value,G=T+ +$('g').value,floor=s==='m'?1500:1200,kc=v=>fmtN(Math.round(v),0)+' კკალ';
+  $('oB').textContent=fmtN(B,1);$('oK').textContent=B?cat(B):'—';$('oR').textContent=kc(R);$('oT').textContent=kc(T);$('oG').textContent=kc(Math.max(G,0));
+  $('oW').textContent=`${fmtN(18.5*m*m,1)} – ${fmtN(24.9*m*m,1)} კგ`;
+  const wr=$('warn');wr.hidden=G>=floor;wr.textContent=`მიზნობრივი კალორიები ${fmtN(floor,0)} კკალ-ზე ნაკლებია. ასეთი შეზღუდვა მხოლოდ სპეციალისტის მეთვალყურეობით არის რეკომენდებული.`;});
+GT.copy($('copy'),$('copied'));})();
+</script>
+</Base>

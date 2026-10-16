@@ -57,10 +57,34 @@ content:
         label: სურათის აღწერა
         type: string
         required: false
+      - name: featured
+        label: რჩეული (გამოჩნდეს მთავარ გვერდზე)
+        type: boolean
+        default: false
       - name: draft
         label: მონახაზი (არ გამოქვეყნდეს)
         type: boolean
         default: false
+      - name: body
+        label: ტექსტი
+        type: rich-text
+  - name: about
+    label: ჩემ შესახებ
+    type: file
+    path: src/content/pages/about.md
+    fields:
+      - name: title
+        label: სათაური
+        type: string
+        required: true
+      - name: description
+        label: მოკლე აღწერა (საძიებო სისტემებისთვის)
+        type: text
+        required: false
+      - name: image
+        label: ფოტო
+        type: image
+        required: false
       - name: body
         label: ტექსტი
         type: rich-text

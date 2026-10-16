@@ -1,9 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import Img from '../components/Img.astro';
+import { getEntry, render } from 'astro:content';
+const page = await getEntry('pages', 'about');
+if (!page) throw new Error('src/content/pages/about.md is missing');
+const { Content } = await render(page);
 ---
-<Base title="ჩემ შესახებ">
-  <h1>ჩემ შესახებ</h1>
-  <p class="note">✏️ <b>შესავსებია:</b> ეს დროებითი ტექსტია. ჩაანაცვლე საკუთარი ამბით ფაილში <code>src/pages/about.astro</code>.</p>
-  <p>აქ დაწერე, ვინ ხარ, რით ხარ დაკავებული და რატომ გადაწყვიტე ამ ბლოგის დაწყება.</p>
-  <p>ამ ბლოგზე ვაქვეყნებ პირად ჩანაწერებს ფსიქოლოგიაზე, ჯანსაღ ცხოვრებაზე, ბიზნესსა და მარკეტინგზე.</p>
+<Base title={page.data.title} description={page.data.description} image={page.data.image}>
+  <h1 style="margin-top:0">{page.data.title}</h1>
+  {page.data.image && <figure class="hero"><Img src={page.data.image} alt={page.data.title} loading="eager" /></figure>}
+  <div class="prose"><Content /></div>
 </Base>

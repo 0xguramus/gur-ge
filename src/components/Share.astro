@@ -1,0 +1,27 @@
+---
+const { title, url } = Astro.props;
+const u = encodeURIComponent(url), t = encodeURIComponent(title);
+const links = [
+  ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${u}`],
+  ['X', `https://x.com/intent/post?url=${u}&text=${t}`],
+  ['LinkedIn', `https://www.linkedin.com/sharing/share-offsite/?url=${u}`],
+  ['Telegram', `https://t.me/share/url?url=${u}&text=${t}`],
+  ['WhatsApp', `https://wa.me/?text=${t}%20${u}`],
+];
+---
+<div class="share" data-url={url} data-title={title}>
+  <span class="meta">გაზიარება:</span>
+  <button type="button" class="chip share-native" hidden>📤 გაზიარება</button>
+  {links.map(([n, h]) => <a class="chip" href={h} target="_blank" rel="noopener noreferrer">{n}</a>)}
+  <button type="button" class="chip share-copy">🔗 ბმულის კოპირება</button>
+  <span class="meta share-ok" aria-live="polite"></span>
+</div>
+<style>.share{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:32px 0 0}.share .chip{font-size:.82rem;padding:4px 12px}</style>
+<script is:inline>
+document.querySelectorAll('.share').forEach(el=>{
+  const url=location.origin+location.pathname,title=el.dataset.title,nb=el.querySelector('.share-native'),ok=el.querySelector('.share-ok');
+  if(navigator.share){nb.hidden=false;nb.onclick=()=>navigator.share({title,url}).catch(()=>{})}
+  el.querySelector('.share-copy').onclick=async()=>{let s=false;try{await navigator.clipboard.writeText(url);s=true}catch(e){const t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{s=document.execCommand('copy')}catch(_){}t.remove()}
+    ok.textContent=s?'დაკოპირდა ✓':'ვერ დაკოპირდა';setTimeout(()=>ok.textContent='',2500)};
+});
+</script>

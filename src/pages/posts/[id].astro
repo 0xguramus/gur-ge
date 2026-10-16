@@ -1,6 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PostCard from '../../layouts/PostCard.astro';
+import Share from '../../components/Share.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import Comments from '../../components/Comments.astro';
 import { render } from 'astro:content';
 import { getPosts, CATEGORIES, fmt, readingTime, rtLabel, tagSlug } from '../../lib/site';
 export async function getStaticPaths() { return (await getPosts()).map(post => ({ params: { id: post.id }, props: { post } })); }
@@ -21,7 +24,9 @@ const related = (await getPosts()).filter(p => p.id !== post.id)
     {showToc && <details class="toc" open style="margin-top:20px"><summary>სარჩევი</summary><ol>{toc.map(h => <li class={`d${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details>}
     <div class="prose"><Content /></div>
   </article>
-  <slot name="after" />
+  <Share title={d.title} url={new URL(`/posts/${post.id}/`, Astro.site).href} />
+  <Subscribe />
   {related.length > 0 && <section class="related"><h2 style="font-size:1.2rem">მსგავსი ჩანაწერები</h2>{related.map(p => <PostCard post={p} />)}</section>}
+  <Comments />
   <p style="margin-top:40px"><a href="/">← ყველა ჩანაწერი</a></p>
 </Base>

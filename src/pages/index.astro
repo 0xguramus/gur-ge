@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro'; import PostCard from '../layouts/PostCard.astro';
+import Subscribe from '../components/Subscribe.astro';
 import { getPosts, CATEGORIES, SITE } from '../lib/site';
 const posts = await getPosts();
 ---
@@ -12,6 +13,7 @@ const posts = await getPosts();
   </div>
   <div id="list">{posts.map(p => <PostCard post={p} />)}</div>
   <p id="empty" class="meta" hidden>ამ კატეგორიაში ჯერ ჩანაწერი არ არის.</p>
+  <Subscribe />
   <script is:inline>
     const btns=document.querySelectorAll('#filter .chip');
     btns.forEach(b=>b.onclick=()=>{btns.forEach(x=>x.classList.toggle('active',x===b));let n=0;

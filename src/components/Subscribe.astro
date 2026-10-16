@@ -1,0 +1,24 @@
+---
+import { NEWSLETTER } from '../lib/config';
+const on = !!NEWSLETTER.action;
+---
+<section class="sub">
+  <h2>გამოიწერე ახალი ჩანაწერები</h2>
+  {on ? (
+    <form action={NEWSLETTER.action} method="post" target="_blank" class="sub-form">
+      <input type="email" name={NEWSLETTER.emailField} required placeholder="შენი ელფოსტა" aria-label="ელფოსტა" autocomplete="email" inputmode="email" />
+      {Object.entries(NEWSLETTER.extraFields).map(([k, v]) => <input type="hidden" name={k} value={v} />)}
+      <button type="submit">გამოწერა</button>
+    </form>
+  ) : (
+    <p class="meta" style="margin:0">ელფოსტით გამოწერა მალე ჩაირთვება. მანამდე შეგიძლია მომყვე <a href="/rss.xml">RSS-ით</a>.</p>
+  )}
+  {on && <p class="meta" style="margin:8px 0 0;font-size:.8rem">სპამი არ იქნება. გამოწერის გაუქმება ნებისმიერ დროს შეგიძლია.</p>}
+</section>
+<style>
+.sub{background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:36px 0 0}
+.sub h2{margin:0 0 10px;font-size:1.15rem}
+.sub-form{display:flex;gap:8px;flex-wrap:wrap}
+.sub-form input{flex:1 1 200px;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg)}
+.sub-form button{font:inherit;padding:10px 18px;border:0;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer}
+</style>

@@ -3,6 +3,7 @@ title: "ჯანსაღი ჩვევები ძილით იწყე
 description: "ნიმუში: რატომ ღირს ცვლილებების დაწყება ძილის რეჟიმით."
 date: 2026-10-14
 category: health
+tags: [ძილი, ჩვევები]
 image: /images/example-sleep.jpg
 imageAlt: "მთვარიანი ღამის ცა — სანიმუშო სურათი"
 ---

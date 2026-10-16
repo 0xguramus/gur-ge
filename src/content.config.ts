@@ -8,6 +8,7 @@ const posts = defineCollection({
     date: z.coerce.date(),
     category: z.enum(['psychology', 'health', 'business', 'notes']),
     draft: z.boolean().default(false),
+    tags: z.array(z.string()).default([]),
     image: z.string().optional(),
     imageAlt: z.string().optional(),
   }),

@@ -1,0 +1,12 @@
+---
+import Base from '../../layouts/Base.astro'; import PostCard from '../../layouts/PostCard.astro';
+import { getPosts, getTags, tagSlug } from '../../lib/site';
+export async function getStaticPaths() { return (await getTags()).map(t => ({ params: { tag: t.slug }, props: { name: t.name } })); }
+const { tag } = Astro.params; const { name } = Astro.props;
+const posts = (await getPosts()).filter(p => p.data.tags.some(t => tagSlug(t) === tag));
+---
+<Base title={`#${name}`} description={`ჩანაწერები თეგით „${name}“.`}>
+  <p class="meta" style="margin:0"><a href="/tags/">← ყველა თეგი</a></p>
+  <h1 style="margin-top:4px">#{name}</h1>
+  {posts.map(p => <PostCard post={p} />)}
+</Base>

@@ -41,6 +41,12 @@ content:
               label: ბიზნესი და მარკეტინგი
             - value: notes
               label: ზოგადი ჩანაწერები
+      - name: tags
+        label: თეგები
+        description: მოკლე საკვანძო სიტყვები, მაგ. „ძილი“, „ჩვევები“
+        type: string
+        list: true
+        required: false
       - name: image
         label: მთავარი სურათი
         type: image

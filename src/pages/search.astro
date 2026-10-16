@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="ძიება" description="მოძებნე ჩანაწერები gur.ge-ზე.">
+  <h1 style="margin-top:0">ძიება</h1>
+  <input id="q" type="search" placeholder="რას ეძებ?" aria-label="საძიებო სიტყვა" autocomplete="off" enterkeyhint="search"
+    style="width:100%;font:inherit;font-size:16px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--fg)" />
+  <p id="info" class="meta"></p>
+  <div id="res"></div>
+  <script is:inline>
+  (function(){
+    const q=document.getElementById('q'),res=document.getElementById('res'),info=document.getElementById('info');let idx=null;
+    const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const norm=s=>(s||'').toLowerCase();
+    function snippet(b,w){const i=norm(b).indexOf(w);if(i<0)return '';const s=Math.max(0,i-60);return (s?'…':'')+esc(b.slice(s,i+120))+'…'}
+    function go(){const v=q.value.trim();history.replaceState(null,'',v?'?q='+encodeURIComponent(v):location.pathname);
+      if(!idx){info.textContent='იტვირთება…';return}
+      if(!v){res.innerHTML='';info.textContent='ჩაწერე საძიებო სიტყვა.';return}
+      const words=norm(v).split(/\s+/).filter(Boolean);
+      const hits=idx.map(p=>{const T=norm(p.t),D=norm(p.d),G=norm(p.g.join(' ')),B=norm(p.b);let s=0;
+        for(const w of words){const a=(T.includes(w)?5:0)+(G.includes(w)?4:0)+(D.includes(w)?3:0)+(B.includes(w)?1:0);if(!a)return null;s+=a}return {p,s}})
+        .filter(Boolean).sort((a,b)=>b.s-a.s);
+      info.textContent=hits.length?`ნაპოვნია: ${hits.length}`:'ვერაფერი მოიძებნა. სცადე სხვა სიტყვა.';
+      res.innerHTML=hits.map(({p})=>`<a class="card" href="${p.u}"><div class="meta"><b>${esc(p.c)}</b> · ${esc(p.dt)}</div><h2>${esc(p.t)}</h2><p>${esc(p.d)}</p>${snippet(p.b,words[0])?`<p class="meta" style="margin-top:6px">${snippet(p.b,words[0])}</p>`:''}</a>`).join('');}
+    q.value=new URLSearchParams(location.search).get('q')||'';q.addEventListener('input',go);
+    fetch('/search.json').then(r=>r.json()).then(d=>{idx=d;go()}).catch(()=>info.textContent='ძიების ინდექსი ვერ ჩაიტვირთა.');
+    if(!q.value)q.focus();
+  })();
+  </script>
+</Base>

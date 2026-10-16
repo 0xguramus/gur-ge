@@ -1,5 +1,6 @@
 ---
 import { SITE, CATEGORIES } from '../lib/site';
+import { CF_ANALYTICS_TOKEN } from '../lib/config';
 const { title, description = SITE.description, image } = Astro.props;
 const ogImage = image ? new URL(image, Astro.site ?? Astro.url).href : undefined;
 const full = title ? `${title} — ${SITE.title}` : SITE.title;
@@ -13,6 +14,7 @@ const full = title ? `${title} — ${SITE.title}` : SITE.title;
 <meta property="og:type" content="website" /><meta property="og:site_name" content={SITE.title} /><meta property="og:locale" content="ka_GE" /><meta property="og:url" content={new URL(Astro.url.pathname, Astro.site ?? Astro.url).href} />
 <meta property="og:title" content={full} /><meta property="og:description" content={description} />
 {ogImage && <meta property="og:image" content={ogImage} />}{ogImage && <meta property="og:image:width" content="1200" />}{ogImage && <meta property="og:image:height" content="630" />}{ogImage && <meta name="twitter:card" content="summary_large_image" />}<meta name="twitter:title" content={full} /><meta name="twitter:description" content={description} />
+<link rel="sitemap" href="/sitemap-index.xml" />
 <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;500;700&family=Noto+Serif+Georgian:wght@600;700&display=swap" rel="stylesheet" />
@@ -46,7 +48,7 @@ h1,h2,h3{font-family:'Noto Serif Georgian',serif;line-height:1.35}
 .meta{font-size:.85rem;color:var(--muted)}.meta b{color:var(--accent);font-weight:500}
 .example{display:inline-block;font-size:.75rem;background:#f5d9a8;color:#5a3d00;border-radius:6px;padding:1px 8px;margin-left:6px}
 .card .thumb{display:block;width:calc(100% + 44px);margin:-20px -22px 14px;aspect-ratio:1200/630;height:auto;object-fit:cover;border-radius:14px 14px 0 0;background:var(--chip)}
-.hero{margin:18px 0 28px}.hero img{display:block;width:100%;height:auto;aspect-ratio:1200/630;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--chip)}.hero figcaption{font-size:.85rem;color:var(--muted);margin-top:6px;text-align:center}
+.hero{margin:18px 0 28px}.hero picture{display:block}.card picture{display:block}.hero img{display:block;width:100%;height:auto;aspect-ratio:1200/630;object-fit:cover;border-radius:14px;border:1px solid var(--line);background:var(--chip)}.hero figcaption{font-size:.85rem;color:var(--muted);margin-top:6px;text-align:center}
 .prose img{max-width:100%}.prose blockquote{border-left:3px solid var(--accent);margin:0;padding-left:16px;color:var(--muted)}
 .note{background:var(--chip);border:1px dashed var(--accent);border-radius:12px;padding:12px 16px}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}.tag{font-size:.8rem;color:var(--muted);text-decoration:none;background:var(--chip);border-radius:999px;padding:2px 10px}.tag:hover{color:var(--accent)}
@@ -68,4 +70,5 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 <script is:inline>
 document.getElementById('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('theme',r.dataset.theme)};
 </script>
+{CF_ANALYTICS_TOKEN && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: CF_ANALYTICS_TOKEN })}></script>}
 </body></html>

@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import PostCard from '../../layouts/PostCard.astro';
+import Img from '../../components/Img.astro';
 import Share from '../../components/Share.astro';
 import Subscribe from '../../components/Subscribe.astro';
 import Comments from '../../components/Comments.astro';
@@ -20,7 +21,7 @@ const related = (await getPosts()).filter(p => p.id !== post.id)
     <div class="meta"><a href={`/category/${d.category}/`}><b>{CATEGORIES[d.category]}</b></a> · {fmt(d.date)} · {rtLabel(readingTime(post.body))}</div>
     <h1 style="margin-top:8px;margin-bottom:6px">{d.title}</h1>
     {d.tags.length > 0 && <div class="tags">{d.tags.map(t => <a class="tag" href={`/tags/${tagSlug(t)}/`}>#{t}</a>)}</div>}
-    {d.image && <figure class="hero"><img src={d.image} alt={d.imageAlt || d.title} width="1200" height="630" loading="eager" fetchpriority="high" decoding="async" />{d.imageAlt && <figcaption>{d.imageAlt}</figcaption>}</figure>}
+    {d.image && <figure class="hero"><Img src={d.image} alt={d.imageAlt || d.title} loading="eager" fetchpriority="high" />{d.imageAlt && <figcaption>{d.imageAlt}</figcaption>}</figure>}
     {showToc && <details class="toc" open style="margin-top:20px"><summary>სარჩევი</summary><ol>{toc.map(h => <li class={`d${h.depth}`}><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details>}
     <div class="prose"><Content /></div>
   </article>

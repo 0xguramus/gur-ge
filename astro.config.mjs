@@ -1,2 +1,6 @@
 import { defineConfig } from 'astro/config';
-export default defineConfig({ site: 'https://gur.ge' });
+import sitemap from '@astrojs/sitemap';
+export default defineConfig({
+  site: 'https://gur.ge',
+  integrations: [sitemap()]
+});

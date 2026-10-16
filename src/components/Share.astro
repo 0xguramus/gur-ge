@@ -20,6 +20,7 @@ const links = [
 <script is:inline>
 document.querySelectorAll('.share').forEach(el=>{
   const url=location.origin+location.pathname,title=el.dataset.title,nb=el.querySelector('.share-native'),ok=el.querySelector('.share-ok');
+  const enc=encodeURIComponent(el.dataset.url);el.querySelectorAll('a.chip').forEach(a=>a.href=a.href.split(enc).join(encodeURIComponent(url)));
   if(navigator.share){nb.hidden=false;nb.onclick=()=>navigator.share({title,url}).catch(()=>{})}
   el.querySelector('.share-copy').onclick=async()=>{let s=false;try{await navigator.clipboard.writeText(url);s=true}catch(e){const t=document.createElement('textarea');t.value=url;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();try{s=document.execCommand('copy')}catch(_){}t.remove()}
     ok.textContent=s?'დაკოპირდა ✓':'ვერ დაკოპირდა';setTimeout(()=>ok.textContent='',2500)};

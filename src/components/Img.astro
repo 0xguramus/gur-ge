@@ -1,0 +1,9 @@
+---
+// Responsive image for files in public/images: WebP srcset (built by scripts/optimize-images.mjs) with original as fallback.
+const { src, alt = '', class: cls, sizes = '(max-width: 800px) 100vw, 760px', loading = 'lazy', fetchpriority, width = 1200, height = 630 } = Astro.props;
+const m = typeof src === 'string' && src.match(/^\/images\/([^/]+)\.(jpe?g|png|webp)$/i);
+const srcset = m ? [480, 960, 1440].map(w => `/_img/${m[1]}-${w}.webp ${w}w`).join(', ') : null;
+---
+{srcset ? (
+  <picture><source type="image/webp" srcset={srcset} sizes={sizes} /><img class={cls} src={src} alt={alt} width={width} height={height} loading={loading} decoding="async" fetchpriority={fetchpriority} /></picture>
+) : <img class={cls} src={src} alt={alt} width={width} height={height} loading={loading} decoding="async" fetchpriority={fetchpriority} />}

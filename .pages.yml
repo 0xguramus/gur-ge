@@ -61,6 +61,36 @@ content:
         label: რჩეული (გამოჩნდეს მთავარ გვერდზე)
         type: boolean
         default: false
+      - name: layout
+        label: გვერდის დიზაინი
+        type: select
+        default: default
+        options:
+          values:
+            - value: default
+              label: ჩვეულებრივი
+            - value: apple
+              label: პროდუქტის გვერდი (Apple-ის სტილი)
+      - name: kicker
+        label: ზედა წარწერა (მხოლოდ პროდუქტის დიზაინისთვის)
+        type: string
+        required: false
+      - name: highlights
+        label: მთავარი მახასიათებლები (ბენტო ბარათები)
+        type: object
+        list: true
+        required: false
+        fields:
+          - name: label
+            label: სათაური
+            type: string
+          - name: value
+            label: მთავარი მნიშვნელობა
+            type: string
+          - name: note
+            label: მოკლე განმარტება
+            type: string
+            required: false
       - name: draft
         label: მონახაზი (არ გამოქვეყნდეს)
         type: boolean

@@ -1,7 +1,7 @@
 ---
 import { SITE, CATEGORIES } from '../lib/site';
 import { CF_ANALYTICS_TOKEN } from '../lib/config';
-const { title, description = SITE.description, image } = Astro.props;
+const { title, description = SITE.description, image, variant = 'default' } = Astro.props;
 const ogImage = new URL(image || '/images/og-default.png', Astro.site ?? Astro.url).href;
 const full = title ? `${title} — ${SITE.title}` : SITE.title;
 ---
@@ -56,17 +56,18 @@ h1,h2,h3{font-family:'Noto Serif Georgian',serif;line-height:1.35}
 .toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 16px;margin:0 0 24px}.toc summary{cursor:pointer;font-weight:500}.toc ol{margin:8px 0 4px;padding-left:20px}.toc li.d3{margin-left:16px;list-style:circle}.toc a{color:var(--fg);text-decoration:none}.toc a:hover{color:var(--accent)}
 .prose h2,.prose h3{scroll-margin-top:16px}
 .related{margin-top:44px;border-top:1px solid var(--line);padding-top:16px}.related .card{padding:14px 18px}.related .card h2{font-size:1.1rem}
+main.full{padding:0}
 footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.85rem}
 @media (max-width:560px){body{font-size:16px}nav{gap:12px;font-size:.88rem}header .wrap{padding-top:14px;padding-bottom:14px}}
 </style>
 </head>
-<body>
+<body class={`v-${variant}`}>
 <header><div class="wrap">
   <a class="logo" href="/" aria-label="genius.ge — მთავარი">genius<span>.</span>ge</a>
   <nav><a href="/">მთავარი</a><a href="/tools/">ხელსაწყოები</a><a href="/search/" aria-label="ძიება" title="ძიება">🔍</a><a href="/about/">ჩემ შესახებ</a><a href="/rss.xml">RSS</a>
   <button id="theme" aria-label="თემის შეცვლა">◐</button></nav>
 </div></header>
-<main><div class="wrap"><slot /></div></main>
+{variant === 'default' ? <main><div class="wrap"><slot /></div></main> : <main class="full"><slot /></main>}
 <footer><div class="wrap"><a href="/tags/" style="color:inherit">თეგები</a> · <a href="/search/" style="color:inherit">ძიება</a><br />© {new Date().getFullYear()} {SITE.title} · {Object.values(CATEGORIES).join(' · ')}</div></footer>
 <script is:inline>
 document.getElementById('theme').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('theme',r.dataset.theme)};

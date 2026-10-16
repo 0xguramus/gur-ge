@@ -1,0 +1,70 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+<Base title="რთული პროცენტის კალკულატორი" description="გამოთვალე, როგორ გაიზრდება შენი დანაზოგი რთული პროცენტით: საწყისი თანხა, ყოველთვიური შენატანი, საპროცენტო განაკვეთი და ვადა.">
+<h1 style="margin-top:0">რთული პროცენტის კალკულატორი</h1>
+<p class="meta" style="margin-top:-8px">შეიყვანე მონაცემები და შედეგი მყისიერად განახლდება.</p>
+<form id="ci" class="ci-form" onsubmit="return false">
+  <label>საწყისი თანხა<input id="p" type="number" inputmode="decimal" min="0" step="any" value="1000" /></label>
+  <label>ყოველთვიური შენატანი<input id="m" type="number" inputmode="decimal" min="0" step="any" value="100" /></label>
+  <label>წლიური საპროცენტო განაკვეთი (%)<input id="r" type="number" inputmode="decimal" min="0" step="any" value="10" /></label>
+  <label>ვადა (წელი)<input id="y" type="number" inputmode="numeric" min="1" max="100" step="1" value="10" /></label>
+  <label>დარიცხვის სიხშირე<select id="n"><option value="1">წლიური</option><option value="4">კვარტალური</option><option value="12" selected>ყოველთვიური</option><option value="365">ყოველდღიური</option></select></label>
+  <label>ვალუტა<select id="c"><option value="₾" selected>₾ ლარი</option><option value="$">$ დოლარი</option><option value="€">€ ევრო</option></select></label>
+</form>
+<div class="ci-res">
+  <div><span>საბოლოო ბალანსი</span><b id="oF"></b></div>
+  <div><span>ჯამური შენატანი</span><b id="oC"></b></div>
+  <div><span>დარიცხული პროცენტი</span><b id="oI"></b></div>
+</div>
+<h2>ზრდის დინამიკა</h2>
+<div class="ci-legend"><i style="background:var(--muted)"></i>შენატანები <i style="background:var(--accent)"></i>პროცენტი</div>
+<svg id="chart" viewBox="0 0 600 260" role="img" aria-label="ბალანსის ზრდის დიაგრამა"></svg>
+<h2>წლიური ჭრილი</h2>
+<div class="ci-table"><table><thead><tr><th>წელი</th><th>შენატანი</th><th>პროცენტი</th><th>ბალანსი</th></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="meta">შენატანი ირიცხება ყოველი თვის ბოლოს. გამოთვლა საორიენტაციოა და არ წარმოადგენს ფინანსურ რჩევას.</p>
+<style>
+.ci-form{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.ci-form label{display:flex;flex-direction:column;font-size:.88rem;color:var(--muted);gap:4px}
+.ci-form input,.ci-form select{font:inherit;font-size:16px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;-webkit-appearance:none;appearance:none}
+.ci-form input:focus,.ci-form select:focus{outline:2px solid var(--accent);border-color:transparent}
+.ci-res{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.ci-res div{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ci-res span{display:block;font-size:.8rem;color:var(--muted)}.ci-res b{font-size:1.15rem;word-break:break-word}
+.ci-res div:first-child b{color:var(--accent)}
+.ci-legend{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px}.ci-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-left:8px}
+#chart{width:100%;height:auto;display:block;margin:8px 0}
+.ci-table{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.ci-table table{width:100%;border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums}
+.ci-table th,.ci-table td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.ci-table th{background:var(--chip);font-weight:500;position:sticky;top:0}.ci-table th:first-child,.ci-table td:first-child{text-align:left}
+@media (max-width:560px){.ci-form{grid-template-columns:1fr}.ci-res{grid-template-columns:1fr}}
+</style>
+<script is:inline>
+(function(){
+const $=id=>document.getElementById(id);
+const num=id=>{const v=parseFloat($(id).value);return isFinite(v)&&v>0?v:0};
+function calc(P,M,rate,years,n){
+  // effective monthly rate for the chosen compounding frequency
+  const im=Math.pow(1+rate/100/n,n/12)-1;let bal=P,contrib=P;const rows=[];
+  for(let y=1;y<=years;y++){for(let k=0;k<12;k++){bal=bal*(1+im)+M;contrib+=M}rows.push({y,contrib,interest:bal-contrib,bal})}
+  return rows;
+}
+window.ciCalc=calc;
+function run(){
+  const cur=$('c').value,years=Math.min(100,Math.max(1,Math.round(num('y'))||1));
+  const f=v=>v.toLocaleString('ka-GE',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+cur;
+  const P=num('p'),rows=calc(P,num('m'),num('r'),years,+$('n').value),last=rows[rows.length-1];
+  $('oF').textContent=f(last.bal);$('oC').textContent=f(last.contrib);$('oI').textContent=f(last.interest);
+  $('tb').innerHTML=rows.map(r=>`<tr><td>${r.y}</td><td>${f(r.contrib)}</td><td>${f(r.interest)}</td><td><b>${f(r.bal)}</b></td></tr>`).join('');
+  const W=600,H=260,L=8,B=24,T=10,max=last.bal||1,bw=(W-L*2)/rows.length,g=Math.min(bw*.2,6);
+  let s='';rows.forEach((r,i)=>{const x=L+i*bw+g/2,w=bw-g,hc=(r.contrib/max)*(H-B-T),hi=(Math.max(r.interest,0)/max)*(H-B-T);
+    s+=`<rect x="${x}" y="${H-B-hc}" width="${w}" height="${hc}" fill="var(--muted)" opacity=".55" rx="2"><title>${r.y} წ.: ${f(r.bal)}</title></rect><rect x="${x}" y="${H-B-hc-hi}" width="${w}" height="${hi}" fill="var(--accent)" rx="2"><title>${r.y} წ.: ${f(r.bal)}</title></rect>`;
+    const step=Math.ceil(rows.length/10);if((i+1)%step===0||i===0)s+=`<text x="${x+w/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="var(--muted)">${r.y}</text>`;});
+  s+=`<line x1="${L}" x2="${W-L}" y1="${H-B}" y2="${H-B}" stroke="var(--line)"/>`;
+  $('chart').innerHTML=s;
+}
+$('ci').addEventListener('input',run);$('ci').addEventListener('change',run);run();
+})();
+</script>
+</Base>
